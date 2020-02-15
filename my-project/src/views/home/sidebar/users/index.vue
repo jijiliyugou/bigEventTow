@@ -281,8 +281,7 @@ export default {
           this.$http({
             method: "post",
             url: "users",
-            data: this.formData,
-            headers: { Authorization: localStorage.getItem("token") }
+            data: this.formData
           })
             .then(res => {
               const { meta } = res.data;
@@ -318,10 +317,7 @@ export default {
         .then(() => {
           this.$http({
             method: "delete",
-            url: `users/${row.id}`,
-            headers: {
-              Authorization: localStorage.getItem("token")
-            }
+            url: `users/${row.id}`
           })
             .then(res => {
               const { meta } = res.data;
@@ -354,9 +350,6 @@ export default {
       this.$http({
         method: "put",
         url: `users/${this.editData.id}`,
-        headers: {
-          Authorization: localStorage.getItem("token")
-        },
         data: {
           id: this.editData.id,
           email: this.editData.email,
@@ -383,10 +376,7 @@ export default {
       this.getRolesById(row.id);
       this.$http({
         method: "get",
-        url: "roles",
-        headers: {
-          Authorization: localStorage.getItem("token")
-        }
+        url: "roles"
       }).then(res => {
         const{meta,data}=res.data
         if(meta.status === 200){
@@ -398,10 +388,7 @@ export default {
     getRolesById(id) {
       this.$http({
         method: "get",
-        url: "users/" + id,
-        headers: {
-          Authorization: localStorage.getItem("token")
-        }
+        url: "users/" + id
       }).then(res => {
         const { data, meta } = res.data;
         if (meta.status === 200) {
@@ -416,9 +403,6 @@ export default {
         url:`users/${this.RolesName.id}/role`,
         data:{
           rid:this.RolesName.rid
-        },
-        headers:{
-          Authorization: localStorage.getItem("token")
         }
       }).then(res=>{
         const{meta} = res.data
@@ -435,10 +419,7 @@ export default {
     setStatus(row){
     this.$http({
       method:'put',
-      url:`users/${row.id}/state/${row.mg_state}`,
-      headers:{
-        Authorization: localStorage.getItem("token")
-      }
+      url:`users/${row.id}/state/${row.mg_state}`
     })
     .then(res=>{
       const{meta}=res.data
