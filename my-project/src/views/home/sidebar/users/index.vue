@@ -38,6 +38,7 @@
             v-model="scope.row.mg_state"
             active-color="#13ce66"
             inactive-color="#ff4949"
+            @click="setStatus(scope.row.mg_state)"
           >
           </el-switch>
         </template>
@@ -63,6 +64,7 @@
             size="mini"
             icon="el-icon-check"
             plain
+            @click.prevent="openRoles(scope.row)"
           ></el-button>
         </template>
       </el-table-column>
@@ -144,6 +146,33 @@
         <el-button type="primary" @click.prevent="editDailog">确 定</el-button>
       </div>
     </el-dialog>
+    <!-- 设置角色dailog页 -->
+    <el-dialog title="分配角色" :visible.sync="RolesVisible">
+      <el-form
+        label-position="right"
+        ref="dailogForm"
+        status-icon
+        :model="RolesName"
+      >
+        <el-form-item label="用户名" :label-width="formLabelWidth">
+          <el-input
+            disabled
+            autocomplete="off"
+            v-model="RolesName.username"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="角色" :label-width="formLabelWidth">
+          <el-select v-model="RolesName.rid" placeholder="请选择">
+            <el-option label="请选择" :value="-1"></el-option>
+            <el-option v-for="(item,index) in rolesList" :key="index" :label="item.roleName" :value="item.id"></el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="closeDialog">
+        <el-button @click="RolesVisible = false">取 消</el-button>
+        <el-button type="primary" @click.prevent="setRole">确 定</el-button>
+      </div>
+    </el-dialog>
   </el-card>
 </template>
 <script>
@@ -189,7 +218,16 @@ export default {
         id: "",
         email: "",
         mobile: ""
-      }
+      },
+      // 角色对话框标识
+      RolesVisible: false,
+      RolesName: {
+        RolesName: "",
+        id: null,
+        rid: null
+      },
+      // 角色列表
+      rolesList:[]
     };
   },
   methods: {
@@ -336,6 +374,62 @@ export default {
           }
         })
         .catch(err => console.log(err));
+    },
+    // 打开角色设置面板
+    openRoles(row) {
+      this.RolesName.username = row.username;
+      this.RolesName.id = row.id;
+      this.RolesVisible = true;
+      this.getRolesById(row.id);
+      this.$http({
+        method: "get",
+        url: "roles",
+        headers: {
+          Authorization: localStorage.getItem("token")
+        }
+      }).then(res => {
+        const{meta,data}=res.data
+        if(meta.status === 200){
+          this.rolesList = data
+        } 
+      });
+    },
+    // 根据id获取角色rid
+    getRolesById(id) {
+      this.$http({
+        method: "get",
+        url: "users/" + id,
+        headers: {
+          Authorization: localStorage.getItem("token")
+        }
+      }).then(res => {
+        const { data, meta } = res.data;
+        if (meta.status === 200) {
+          this.RolesName.rid = data.rid;
+        }
+      });
+    },
+    // 提交设置角色
+    setRole(){
+      this.$http({
+        method:'put',
+        url:`users/${this.RolesName.id}/role`,
+        data:{
+          rid:this.RolesName.rid
+        },
+        headers:{
+          Authorization: localStorage.getItem("token")
+        }
+      }).then(res=>{
+        const{meta} = res.data
+        if(meta.status === 200){
+          this.$message.success(meta.msg)
+          this.getTableData()
+          this.RolesVisible = false
+        }else{
+          this.$message.error(meta.msg)
+        }
+      })
     }
   },
   mounted() {
