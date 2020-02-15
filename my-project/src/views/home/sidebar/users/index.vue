@@ -49,6 +49,7 @@
             size="mini"
             icon="el-icon-edit"
             plain
+            @click.prevent="openEdit(scope.row)"
           ></el-button>
           <el-button
             type="danger"
@@ -116,6 +117,33 @@
         <el-button type="primary" @click.prevent="addDailog">确 定</el-button>
       </div>
     </el-dialog>
+    <!-- 编辑用户dailog页 -->
+    <el-dialog title="修改用户" :visible.sync="EditVisible">
+      <el-form
+        label-position="right"
+        ref="dailogForm"
+        status-icon
+        :model="editData"
+      >
+        <el-form-item label="用户名" :label-width="formLabelWidth">
+          <el-input
+            disabled
+            v-model="editData.username"
+            autocomplete="off"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱" :label-width="formLabelWidth">
+          <el-input v-model="editData.email" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="电话" :label-width="formLabelWidth">
+          <el-input v-model="editData.mobile" autocomplete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="closeDialog">
+        <el-button @click="EditVisible = false">取 消</el-button>
+        <el-button type="primary" @click.prevent="editDailog">确 定</el-button>
+      </div>
+    </el-dialog>
   </el-card>
 </template>
 <script>
@@ -152,6 +180,15 @@ export default {
           { required: true, message: "请输入密码", trigger: "blur" },
           { min: 3, message: "长度不能小于3", trigger: "blur" }
         ]
+      },
+      // 编辑对话框标识
+      EditVisible: false,
+      // 编辑数据源
+      editData: {
+        username: "",
+        id: "",
+        email: "",
+        mobile: ""
       }
     };
   },
@@ -219,7 +256,7 @@ export default {
                   email: "",
                   mobile: ""
                 };
-                this.getTableData()
+                this.getTableData();
                 this.dialogVisible = false;
               } else {
                 this.$message.error(meta.msg);
@@ -263,6 +300,42 @@ export default {
             message: "已取消删除"
           });
         });
+    },
+    // 打开编辑dailog页面
+    openEdit(row) {
+      this.editData = {
+        username: row.username,
+        id: row.id,
+        email: row.email,
+        mobile: row.mobile
+      };
+      this.EditVisible = true;
+    },
+    // 确定编辑数据提交
+    editDailog() {
+      this.$http({
+        method: "put",
+        url: `users/${this.editData.id}`,
+        headers: {
+          Authorization: localStorage.getItem("token")
+        },
+        data: {
+          id: this.editData.id,
+          email: this.editData.email,
+          mobile: this.editData.mobile
+        }
+      })
+        .then(res => {
+          const { meta } = res.data;
+          if (meta.status === 200) {
+            this.$message.success(meta.msg);
+            this.getTableData();
+            this.EditVisible = false;
+          } else {
+            this.$message.success(meta.msg);
+          }
+        })
+        .catch(err => console.log(err));
     }
   },
   mounted() {
