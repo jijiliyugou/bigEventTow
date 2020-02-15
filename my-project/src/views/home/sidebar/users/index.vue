@@ -38,7 +38,7 @@
             v-model="scope.row.mg_state"
             active-color="#13ce66"
             inactive-color="#ff4949"
-            @click="setStatus(scope.row.mg_state)"
+            @change="setStatus(scope.row)"
           >
           </el-switch>
         </template>
@@ -430,6 +430,20 @@ export default {
           this.$message.error(meta.msg)
         }
       })
+    },
+    // 设置用户状态
+    setStatus(row){
+    this.$http({
+      method:'put',
+      url:`users/${row.id}/state/${row.mg_state}`,
+      headers:{
+        Authorization: localStorage.getItem("token")
+      }
+    })
+    .then(res=>{
+      const{meta}=res.data
+      this.$message.success(meta.msg)
+    })
     }
   },
   mounted() {
