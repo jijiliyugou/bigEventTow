@@ -43,7 +43,7 @@
         </template>
       </el-table-column>
       <el-table-column label="操作">
-        <template slot-scope="">
+        <template slot-scope="scope">
           <el-button
             type="primary"
             size="mini"
@@ -55,6 +55,7 @@
             size="mini"
             icon="el-icon-delete"
             plain
+            @click.prevent="danger(scope.row)"
           ></el-button>
           <el-button
             type="success"
@@ -155,6 +156,7 @@ export default {
     };
   },
   methods: {
+    // 获取数据
     getTableData() {
       this.$http({
         method: "get",
@@ -164,6 +166,11 @@ export default {
         .then(res => {
           const { meta, data } = res.data;
           if (meta.status === 200) {
+            if (data.users.length === 0 && this.pagenum !== 1) {
+              this.pagenum--;
+              this.getTableData();
+              return;
+            }
             this.total = data.total;
             this.tableData = data.users;
           }
@@ -212,6 +219,7 @@ export default {
                   email: "",
                   mobile: ""
                 };
+                this.getTableData()
                 this.dialogVisible = false;
               } else {
                 this.$message.error(meta.msg);
@@ -224,6 +232,37 @@ export default {
           return false;
         }
       });
+    },
+    // 删除用户列表数据
+    danger(row) {
+      this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          this.$http({
+            method: "delete",
+            url: `users/${row.id}`,
+            headers: {
+              Authorization: localStorage.getItem("token")
+            }
+          })
+            .then(res => {
+              const { meta } = res.data;
+              if (meta.status === 200) {
+                this.$message.success(meta.msg);
+                this.getTableData();
+              }
+            })
+            .catch(err => console.log(err));
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除"
+          });
+        });
     }
   },
   mounted() {
