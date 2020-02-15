@@ -1,26 +1,36 @@
 <template>
   <el-container>
+    <!-- 头部组件 -->
     <el-header>
-      <el-row :gutter="20">
-        <el-col :span="6">
-          <img src="@/assets/img/logo.png" alt="" />
-        </el-col>
-        <el-col :span="12">
-          <h1>Vue 电商后台管理系统</h1>
-        </el-col>
-        <el-col :span="6">
-          <a href="#" class="dropOut">退出</a>
-        </el-col>
-      </el-row>
+      <TopHead></TopHead>
     </el-header>
     <el-container>
-      <el-aside width="200px">Aside</el-aside>
-      <el-main>Main</el-main>
+      <!-- 侧边栏 -->
+      <Sidebar></Sidebar>
+      <!-- 内容区 -->
+      <el-main>
+        <router-view></router-view>
+      </el-main>
     </el-container>
   </el-container>
 </template>
 <script>
-export default {};
+import TopHead from "./top-head";
+import Sidebar from "./sidebar";
+export default {
+  components: {
+    TopHead,
+    Sidebar
+  },
+  methods: {},
+  mounted() {
+    // 进来获取token值
+    if (!localStorage.getItem("token")) {
+      this.$message.warning("请先登录");
+      this.$router.push("/login");
+    }
+  }
+};
 </script>
 <style scoped lang="less">
 .el-container {
@@ -30,32 +40,10 @@ export default {};
     color: #333;
     text-align: center;
     line-height: 60px;
-    img {
-      height: 60px;
-      vertical-align: top;
-    }
-    h1 {
-      margin: 0;
-      color: #fff;
-    }
-    .dropOut {
-      float: right;
-      text-decoration: none;
-    }
   }
-
-  .el-aside {
-    background-color: #d3dce6;
-    color: #333;
-    text-align: center;
-    line-height: 200px;
-  }
-
   .el-main {
     background-color: #e9eef3;
     color: #333;
-    text-align: center;
-    line-height: 160px;
   }
 }
 </style>

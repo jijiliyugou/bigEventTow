@@ -2,14 +2,11 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import Login from "@/views/login";
 import Home from "@/views/home";
+import Users from "@/views/home/sidebar/users";
 
 Vue.use(VueRouter);
 export default new VueRouter({
   routes: [
-    {
-      path: "/home",
-      component: Home
-    },
     {
       path: "/login",
       component: Login
@@ -17,7 +14,12 @@ export default new VueRouter({
     {
       // 重定向
       path: "/",
-      redirect: "/login"
+      redirect: "/home"
+    },
+    {
+      path: "/home",
+      component: Home,
+      children: [{ path: "/users", component: Users }]
     }
   ]
 });
