@@ -1,7 +1,7 @@
 <template>
   <el-card class="box-card">
     <!-- 面包屑组件 -->
-    <Bread></Bread>
+    <Bread :manage="manage" :list="userList"></Bread>
     <!-- 搜索框 -->
     <el-row class="myRow" :gutter="10">
       <el-col :span="6">
@@ -164,7 +164,12 @@
         <el-form-item label="角色" :label-width="formLabelWidth">
           <el-select v-model="RolesName.rid" placeholder="请选择">
             <el-option label="请选择" :value="-1"></el-option>
-            <el-option v-for="(item,index) in rolesList" :key="index" :label="item.roleName" :value="item.id"></el-option>
+            <el-option
+              v-for="(item, index) in rolesList"
+              :key="index"
+              :label="item.roleName"
+              :value="item.id"
+            ></el-option>
           </el-select>
         </el-form-item>
       </el-form>
@@ -183,6 +188,9 @@ export default {
   },
   data() {
     return {
+      // 父子传值面包屑
+      manage: "用户管理",
+      userList: "用户列表",
       tableData: [],
       query: "",
       pagenum: 1,
@@ -227,7 +235,7 @@ export default {
         rid: null
       },
       // 角色列表
-      rolesList:[]
+      rolesList: []
     };
   },
   methods: {
@@ -378,10 +386,10 @@ export default {
         method: "get",
         url: "roles"
       }).then(res => {
-        const{meta,data}=res.data
-        if(meta.status === 200){
-          this.rolesList = data
-        } 
+        const { meta, data } = res.data;
+        if (meta.status === 200) {
+          this.rolesList = data;
+        }
       });
     },
     // 根据id获取角色rid
@@ -397,34 +405,33 @@ export default {
       });
     },
     // 提交设置角色
-    setRole(){
+    setRole() {
       this.$http({
-        method:'put',
-        url:`users/${this.RolesName.id}/role`,
-        data:{
-          rid:this.RolesName.rid
+        method: "put",
+        url: `users/${this.RolesName.id}/role`,
+        data: {
+          rid: this.RolesName.rid
         }
-      }).then(res=>{
-        const{meta} = res.data
-        if(meta.status === 200){
-          this.$message.success(meta.msg)
-          this.getTableData()
-          this.RolesVisible = false
-        }else{
-          this.$message.error(meta.msg)
+      }).then(res => {
+        const { meta } = res.data;
+        if (meta.status === 200) {
+          this.$message.success(meta.msg);
+          this.getTableData();
+          this.RolesVisible = false;
+        } else {
+          this.$message.error(meta.msg);
         }
-      })
+      });
     },
     // 设置用户状态
-    setStatus(row){
-    this.$http({
-      method:'put',
-      url:`users/${row.id}/state/${row.mg_state}`
-    })
-    .then(res=>{
-      const{meta}=res.data
-      this.$message.success(meta.msg)
-    })
+    setStatus(row) {
+      this.$http({
+        method: "put",
+        url: `users/${row.id}/state/${row.mg_state}`
+      }).then(res => {
+        const { meta } = res.data;
+        this.$message.success(meta.msg);
+      });
     }
   },
   mounted() {

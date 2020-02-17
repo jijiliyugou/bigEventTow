@@ -25,10 +25,10 @@ export default {
   methods: {},
   mounted() {
     // 进来获取token值
-    if (!localStorage.getItem("token")) {
-      this.$message.warning("请先登录");
-      this.$router.push("/login");
-    }
+    // if (!localStorage.getItem("token")) {
+    //   this.$message.warning("请先登录");
+    //   this.$router.push("/login");
+    // }
   }
 };
 </script>
