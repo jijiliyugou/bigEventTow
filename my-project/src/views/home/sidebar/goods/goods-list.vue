@@ -19,8 +19,8 @@
         </el-input>
       </el-col>
       <el-col :span="4"
-        ><el-button @click.prevent="openAddDialog" type="success"
-          >添加用户</el-button
+        ><el-button @click.prevent="$router.push('/goodsAdd')" type="success"
+          >添加商品</el-button
         ></el-col
       >
     </el-row>
@@ -82,7 +82,9 @@ export default {
       pagesize: 10,
       total: null,
       // 容量选项
-      pageSizes: [10, 20, 30]
+      pageSizes: [10, 20, 30],
+      //新增面板标识
+      AddDialog: false
     };
   },
   methods: {
