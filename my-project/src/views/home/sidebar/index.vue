@@ -1,73 +1,44 @@
 <template>
   <el-aside width="200px">
     <el-menu class="el-menu-vertical-demo" unique-opened router>
-      <el-submenu index="1">
+      <el-submenu v-for="item in menus" :key="item.id" :index="item.path">
         <template slot="title">
           <i class="el-icon-location"></i>
-          <span>用户管理</span>
+          <span>{{ item.authName }}</span>
         </template>
-        <el-menu-item index="/home/users">
+        <el-menu-item
+          v-for="item2 in item.children"
+          :key="item2.id"
+          :index="item2.path"
+        >
           <i class="el-icon-menu"></i>
-          <span slot="title">用户列表</span>
-        </el-menu-item>
-      </el-submenu>
-      <el-submenu index="2">
-        <template slot="title">
-          <i class="el-icon-location"></i>
-          <span>权限管理</span>
-        </template>
-        <el-menu-item index="/home/roles">
-          <i class="el-icon-menu"></i>
-          <span slot="title">角色列表</span>
-        </el-menu-item>
-        <el-menu-item index="/home/rights">
-          <i class="el-icon-menu"></i>
-          <span slot="title">权限列表</span>
-        </el-menu-item>
-      </el-submenu>
-      <el-submenu index="3">
-        <template slot="title">
-          <i class="el-icon-location"></i>
-          <span>商品管理</span>
-        </template>
-        <el-menu-item index="3-1">
-          <i class="el-icon-menu"></i>
-          <span slot="title">商品列表</span>
-        </el-menu-item>
-        <el-menu-item index="3-2">
-          <i class="el-icon-menu"></i>
-          <span slot="title">分类参数</span>
-        </el-menu-item>
-        <el-menu-item index="/home/categories">
-          <i class="el-icon-menu"></i>
-          <span slot="title">商品分类</span>
-        </el-menu-item>
-      </el-submenu>
-      <el-submenu index="4">
-        <template slot="title">
-          <i class="el-icon-location"></i>
-          <span>订单管理</span>
-        </template>
-        <el-menu-item index="4-1">
-          <i class="el-icon-menu"></i>
-          <span slot="title">订单列表</span>
-        </el-menu-item>
-      </el-submenu>
-      <el-submenu index="5">
-        <template slot="title">
-          <i class="el-icon-location"></i>
-          <span>数据统计</span>
-        </template>
-        <el-menu-item index="5-1">
-          <i class="el-icon-menu"></i>
-          <span slot="title">数据报表</span>
+          <span slot="title">{{ item2.authName }}</span>
         </el-menu-item>
       </el-submenu>
     </el-menu>
   </el-aside>
 </template>
 <script>
-export default {};
+export default {
+  data() {
+    return {
+      menus: []
+    };
+  },
+  methods: {
+    getMenusList() {
+      this.$http.get("menus").then(res => {
+        const { meta, data } = res.data;
+        if (meta.status === 200) {
+          this.menus = data;
+        }
+      });
+    }
+  },
+  mounted() {
+    this.getMenusList();
+  }
+};
 </script>
 <style scoped lang="less">
 .el-aside {
