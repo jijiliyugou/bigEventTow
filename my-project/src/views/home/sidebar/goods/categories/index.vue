@@ -5,9 +5,18 @@
       添加分类
     </el-button>
     <!-- 表格 -->
-    <el-table :data="tableData" style="width: 100%">
-      <el-table-column prop="cat_name" label="分类名称" width="180">
-      </el-table-column>
+    <el-table :data="pageList" style="width: 100%">
+      <el-table-tree-column
+        treeKey="cat_id"
+        parentKey="cat_pid"
+        levelKey="cat_level"
+        prop="cat_name"
+        label="分类名称"
+        width="180"
+        file-icon="icon icon-file"
+        folder-icon="icon icon-folder"
+      >
+      </el-table-tree-column>
       <el-table-column label="级别" width="180">
         <template slot-scope="scope">
           {{
@@ -42,10 +51,13 @@
       </el-table-column>
     </el-table>
     <el-pagination
-      :page-sizes="[100, 200, 300, 400]"
-      :page-size="100"
+      @size-change="sizeChange"
+      @current-change="pagenumChange"
+      :page-sizes="[5, 10, 15, 20]"
+      :page-size="pagesize"
+      :current-page="pagenum"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="400"
+      :total="total"
     >
     </el-pagination>
   </el-card>
@@ -58,7 +70,12 @@ export default {
   },
   data() {
     return {
-      tableData: [{ name: "张三" }]
+      tableData: [],
+      // 分页数据源
+      pageList: [],
+      pagesize: 5,
+      pagenum: 1,
+      total: null
     };
   },
   methods: {
@@ -68,8 +85,26 @@ export default {
         const { data, meta } = res.data;
         if (meta.status === 200) {
           this.tableData = data;
+          this.total = data.length;
+          this.getPageList();
         }
       });
+    },
+    // 获取分页数据
+    getPageList() {
+      let begin = this.pagesize * (this.pagenum - 1);
+      let end = this.pagesize * this.pagenum;
+      this.pageList = this.tableData.slice(begin, end);
+    },
+    // 页码发生改变
+    pagenumChange(val) {
+      this.pagenum = val;
+      this.getPageList();
+    },
+    // 页容量发生改变
+    sizeChange(val) {
+      this.pagesize = val;
+      this.getPageList();
     }
   },
   mounted() {
