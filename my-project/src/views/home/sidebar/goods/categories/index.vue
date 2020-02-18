@@ -1,7 +1,7 @@
 <template>
   <el-card>
     <Bread manage="商品管理" list="商品分类"></Bread>
-    <el-button type="success" plain>
+    <el-button @click.prevent="openSetAdd" type="success" plain>
       添加分类
     </el-button>
     <!-- 表格 -->
@@ -60,6 +60,35 @@
       :total="total"
     >
     </el-pagination>
+    <!-- 添加对话框 -->
+    <el-dialog title="添加商品分类" :visible.sync="addFormVisible">
+      <el-form>
+        <el-form-item
+          label-position="top"
+          label="分类名称"
+          :label-width="formLabelWidth"
+        >
+          <el-input v-model="cateName" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item
+          label="分类名称"
+          label-position="left"
+          :label-width="formLabelWidth"
+        >
+          <!-- 级联框 -->
+          <el-cascader
+            v-model="selValue"
+            :props="selProps"
+            :options="options"
+            clearable
+          ></el-cascader>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="addFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="addClassify">确 定</el-button>
+      </div>
+    </el-dialog>
   </el-card>
 </template>
 <script>
@@ -75,7 +104,23 @@ export default {
       pageList: [],
       pagesize: 5,
       pagenum: 1,
-      total: null
+      total: null,
+      // 添加对话框
+      addFormVisible: false,
+      formLabelWidth: "80px",
+      // 分类名称
+      cateName: "",
+      // 级联框数据源
+      options: [],
+      // 级联选中后的数据源
+      selValue: [],
+      // 级联框配置项
+      selProps: {
+        value: "cat_id",
+        label: "cat_name",
+        children: "children",
+        checkStrictly: true
+      }
     };
   },
   methods: {
@@ -105,6 +150,47 @@ export default {
     sizeChange(val) {
       this.pagesize = val;
       this.getPageList();
+    },
+    // 打开添加对话框
+    openSetAdd() {
+      this.addFormVisible = true;
+      this.getSelData();
+    },
+    // 获取级联框数据
+    // 获取所有数据
+    getSelData() {
+      this.$http.get("categories?type=2").then(res => {
+        const { data, meta } = res.data;
+        if (meta.status === 200) {
+          this.options = data;
+        } else {
+          this.$message.error(meta.msg);
+        }
+      });
+    },
+    // 添加分类
+    addClassify() {
+      let pid =
+        this.selValue.length === 0
+          ? 0
+          : this.selValue[this.selValue.length - 1];
+      let level = this.selValue.length;
+      this.$http
+        .post("categories", {
+          cat_pid: pid,
+          cat_name: this.cateName,
+          cat_level: level
+        })
+        .then(res => {
+          const { meta } = res.data;
+          if (meta.status === 201) {
+            this.$message.success(meta.msg);
+            this.getTableData();
+            this.addFormVisible = false;
+          } else {
+            this.$message.error(meta.msg);
+          }
+        });
     }
   },
   mounted() {
