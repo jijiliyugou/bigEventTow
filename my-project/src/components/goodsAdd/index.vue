@@ -48,11 +48,61 @@
           </el-form-item>
         </el-form>
       </el-tab-pane>
-      <el-tab-pane label="商品参数" name="second">商品参数</el-tab-pane>
-      <el-tab-pane label="商品属性" name="third">商品属性</el-tab-pane>
-      <el-tab-pane label="商品照片" name="123">商品照片</el-tab-pane>
+      <el-tab-pane label="商品参数" name="second">
+        <div v-for="(item, index) in manyData" :key="index">
+          <p>{{ item.attr_name }}</p>
+          <div>
+            <el-checkbox
+              border
+              v-model="checked"
+              v-for="(val, i) in item.attr_vals.split(',')"
+              :key="i"
+              >{{ val }}</el-checkbox
+            >
+          </div>
+        </div>
+      </el-tab-pane>
+      <el-tab-pane label="商品属性" name="third">
+        <el-form
+          ref="ruleForm"
+          label-position="top"
+          label-width="100px"
+          class="demo-ruleForm"
+        >
+          <el-form-item
+            v-for="(item, index) in onlyData"
+            :key="index"
+            :label="item.attr_name"
+          >
+            <el-input v-model="item.attr_vals"></el-input>
+          </el-form-item>
+        </el-form>
+      </el-tab-pane>
+      <el-tab-pane label="商品照片" name="123">
+        <el-upload
+          class="upload-demo"
+          :headers="uploadHead"
+          multiple
+          action="http://localhost:8888/api/private/v1/upload"
+          list-type="picture"
+          :on-success="uploadSuccess"
+          :on-remove="uploadRemove"
+          :on-preview="uploadPreview"
+        >
+          <el-button size="small" type="primary">点击上传</el-button>
+        </el-upload>
+      </el-tab-pane>
       <el-tab-pane label="商品内容" name="456">商品内容</el-tab-pane>
     </el-tabs>
+    <!-- 预览图片的对话框 -->
+    <el-dialog title="收货地址" :visible.sync="uploadDailog">
+      <img ref="uploadRef" src="" alt="" />
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="uploadDailog = false"
+          >确 定</el-button
+        >
+      </div>
+    </el-dialog>
   </el-card>
 </template>
 <script>
@@ -72,25 +122,85 @@ export default {
       // 级联框配置项
       config: {
         value: "cat_id",
-        label: "cat_name",
-        checkStrictly: true
-      }
+        label: "cat_name"
+      },
+      // 商品参数
+      manyData: [],
+      onlyData: [],
+      checked: true,
+      // 上传图片请求头
+      uploadHead: {
+        Authorization: localStorage.getItem("token")
+      },
+      // 已上传的图片集合
+      uploadImg: [],
+      uploadDailog: false
     };
   },
   methods: {
+    // 获取many&only的数据方法
+    getManyOnly(sel) {
+      if (this.value.length != 0) {
+        this.$http
+          .get(
+            `categories/${
+              this.value[this.value.length - 1]
+            }/attributes?sel=${sel}`
+          )
+          .then(res => {
+            const { meta, data } = res.data;
+            if (meta.status === 200) {
+              if (sel === "many") {
+                this.manyData = data;
+              } else {
+                this.onlyData = data;
+              }
+            } else {
+              this.$message.error(meta.msg);
+            }
+          });
+      } else {
+        this.$message.error("请选择商品分类");
+      }
+    },
     // tabs标签被点击时触发
     tabsClick(tag) {
       this.activeName = tag.name;
       this.active = Number(tag.index);
+      if (tag.index === "1") {
+        this.getManyOnly("many");
+      } else if (tag.index === "2") {
+        this.getManyOnly("only");
+      }
     },
     // 获取分类数据
     categories() {
       this.$http.get("categories").then(res => {
         const { meta, data } = res.data;
         if (meta.status === 200) {
-          console.log(data);
           this.cateList = data;
         }
+      });
+    },
+    // 图片上传成功的钩子函数
+    uploadSuccess(res) {
+      this.uploadImg.push(res.data.tmp_path);
+    },
+    // 删除已上传的图片的钩子
+    uploadRemove(file) {
+      const img = file.response.data.tmp_path;
+      this.uploadImg.forEach((item, index) => {
+        if (item === img) {
+          this.uploadImg.splice(index, 1);
+        }
+      });
+    },
+    // 点击已经上传的图片预览钩子
+    uploadPreview(file) {
+      const url = file.response.data.url;
+      this.uploadDailog = true;
+      this.$nextTick(function() {
+        this.$refs.uploadRef.src = url;
       });
     }
   },
