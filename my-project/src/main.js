@@ -27,7 +27,11 @@ import "quill/dist/quill.snow.css";
 import "quill/dist/quill.bubble.css";
 
 Vue.use(VueQuillEditor);
-
+// 使用map
+import BaiduMap from "vue-baidu-map";
+Vue.use(BaiduMap, {
+  ak: "Oul2Cviagu3l9phn9ShA6hGyH5GPDDnB"
+});
 // 开发模式
 Vue.config.productionTip = false;
 // 引入全局css样式

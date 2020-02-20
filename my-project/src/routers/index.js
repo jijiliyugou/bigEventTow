@@ -5,6 +5,7 @@ import Rights from "@/views/home/sidebar/roles/rights";
 import Roles from "@/views/home/sidebar/roles/role";
 import Categories from "@/views/home/sidebar/categories";
 import GoodsList from "@/views/home/sidebar/goods/goods-list.vue";
+import Orders from "@/views/home/sidebar/orders";
 import GoodsAdd from "@/components/goodsAdd";
 import { Message } from "element-ui";
 Vue.use(VueRouter);
@@ -30,7 +31,8 @@ const router = new VueRouter({
         { path: "/roles", component: Roles },
         { path: "/categories", component: Categories },
         { path: "/goods", component: GoodsList },
-        { path: "/goodsAdd", component: GoodsAdd }
+        { path: "/goodsAdd", component: GoodsAdd },
+        { path: "/orders", component: Orders }
       ]
     }
   ]
