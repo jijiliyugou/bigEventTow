@@ -18,6 +18,16 @@ Vue.component(ElTreeGrid.name, ElTreeGrid);
 import elTableInfiniteScroll from "el-table-infinite-scroll";
 Vue.use(elTableInfiniteScroll);
 
+// 引入富文本编辑框
+import VueQuillEditor from "vue-quill-editor";
+
+// require styles
+import "quill/dist/quill.core.css";
+import "quill/dist/quill.snow.css";
+import "quill/dist/quill.bubble.css";
+
+Vue.use(VueQuillEditor);
+
 // 开发模式
 Vue.config.productionTip = false;
 // 引入全局css样式

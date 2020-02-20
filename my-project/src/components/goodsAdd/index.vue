@@ -26,17 +26,17 @@
           label-width="100px"
           class="demo-ruleForm"
         >
-          <el-form-item label="基本信息" prop="name">
-            <el-input></el-input>
+          <el-form-item label="商品名称" prop="name">
+            <el-input v-model="addGoodsData.goods_name"></el-input>
           </el-form-item>
           <el-form-item label="商品价格" prop="name">
-            <el-input></el-input>
+            <el-input v-model="addGoodsData.goods_price"></el-input>
           </el-form-item>
           <el-form-item label="商品重量" prop="name">
-            <el-input></el-input>
+            <el-input v-model="addGoodsData.goods_weight"></el-input>
           </el-form-item>
           <el-form-item label="商品数量" prop="name">
-            <el-input></el-input>
+            <el-input v-model="addGoodsData.goods_number"></el-input>
           </el-form-item>
           <el-form-item label="商品分类" prop="name">
             <el-cascader
@@ -92,7 +92,15 @@
           <el-button size="small" type="primary">点击上传</el-button>
         </el-upload>
       </el-tab-pane>
-      <el-tab-pane label="商品内容" name="456">商品内容</el-tab-pane>
+      <el-tab-pane label="商品内容" name="456">
+        <el-button type="primary" @click="addGoods">添加商品</el-button>
+        <!-- 富文本 -->
+        <quill-editor
+          v-model="addGoodsData.goods_introduce"
+          ref="myQuillEditor"
+        >
+        </quill-editor>
+      </el-tab-pane>
     </el-tabs>
     <!-- 预览图片的对话框 -->
     <el-dialog title="收货地址" :visible.sync="uploadDailog">
@@ -134,7 +142,16 @@ export default {
       },
       // 已上传的图片集合
       uploadImg: [],
-      uploadDailog: false
+      uploadDailog: false,
+      // 添加商品数据对象
+      addGoodsData: {
+        goods_name: "",
+        goods_cat: "",
+        goods_price: "",
+        goods_number: "",
+        goods_weight: "",
+        goods_introduce: "富文本编辑器中的内容"
+      }
     };
   },
   methods: {
@@ -201,6 +218,23 @@ export default {
       this.uploadDailog = true;
       this.$nextTick(function() {
         this.$refs.uploadRef.src = url;
+      });
+    },
+    // 添加商品
+    addGoods() {
+      this.addGoodsData.goods_cat = this.value.join(",");
+      this.$http({
+        url: "goods",
+        method: "post",
+        data: this.addGoodsData
+      }).then(res => {
+        const { meta } = res.data;
+        if (meta.status === 201) {
+          this.$message.success(meta.msg);
+          this.$router.push("/goods");
+        } else {
+          this.$message.error(meta.msg);
+        }
       });
     }
   },
