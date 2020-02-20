@@ -4,12 +4,6 @@ import router from "./routers";
 // 引入axios自定义vue插件
 import myAxios from "@/assets/js/myAxios.js";
 Vue.use(myAxios);
-
-// 引入element相关组件
-import ElementUI from "element-ui";
-import "element-ui/lib/theme-chalk/index.css";
-Vue.use(ElementUI);
-
 // 引入el-tree-grid
 import ElTreeGrid from "element-tree-grid";
 Vue.component(ElTreeGrid.name, ElTreeGrid);

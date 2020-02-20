@@ -1,12 +1,14 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import Users from "@/views/home/sidebar/users";
-import Rights from "@/views/home/sidebar/roles/rights";
-import Roles from "@/views/home/sidebar/roles/role";
-import Categories from "@/views/home/sidebar/categories";
-import GoodsList from "@/views/home/sidebar/goods/goods-list.vue";
-import Orders from "@/views/home/sidebar/orders";
-import GoodsAdd from "@/components/goodsAdd";
+
+const Users = () => import("@/views/home/sidebar/users");
+const Rights = () => import("@/views/home/sidebar/roles/rights");
+const Roles = () => import("@/views/home/sidebar/roles/role");
+const Categories = () => import("@/views/home/sidebar/categories");
+const GoodsList = () => import("@/views/home/sidebar/goods/goods-list.vue");
+const Orders = () => import("@/views/home/sidebar/orders");
+const GoodsAdd = () => import("@/components/goodsAdd");
+
 import { Message } from "element-ui";
 Vue.use(VueRouter);
 const router = new VueRouter({
